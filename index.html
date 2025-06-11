@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Görev Listem</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --secondary: #10B981;
+      --secondary-hover: #059669;
+      --accent: #F59E0B;
+      --accent-hover: #D97706;
+      --danger: #EF4444;
+      --danger-hover: #DC2626;
+      --light: #F8FAFC;
+      --dark: #1E293B;
+      --gray: #E2E8F0;
+      --gray-dark: #94A3B8;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      --border-radius: 12px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #F1F5F9, #E2E8F0);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transform: translateY(0);
+      transition: var(--transition);
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 25px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    .input-group {
+      display: flex;
+      margin-bottom: 25px;
+      gap: 12px;
+      position: relative;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 14px 18px;
+      border: 2px solid var(--gray);
+      border-radius: var(--border-radius);
+      outline: none;
+      font-size: 16px;
+      transition: var(--transition);
+      background: var(--light);
+      font-weight: 500;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .input-group input::placeholder {
+      color: var(--gray-dark);
+      font-weight: 400;
+    }
+
+    .input-group button {
+      padding: 0 24px;
+      border: none;
+      background: var(--primary);
+      color: white;
+      font-weight: 600;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.3), 0 2px 4px -1px rgba(99, 102, 241, 0.2);
+      flex-shrink: 0;
+    }
+
+    .input-group button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3), 0 4px 6px -2px rgba(99, 102, 241, 0.2);
+    }
+
+    .input-group button:active {
+      transform: translateY(0);
+    }
+
+    .input-group button svg {
+      transition: var(--transition);
+    }
+
+    .input-group button:hover svg {
+      transform: rotate(90deg);
+    }
+
+    #gorevListesi {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .todo-item {
+      background: white;
+      padding: 16px 20px;
+      border-radius: var(--border-radius);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .todo-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: var(--primary);
+      transition: var(--transition);
+    }
+
+    .todo-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .todo-item.completed {
+      background: rgba(16, 185, 129, 0.05);
+    }
+
+    .todo-item.completed::before {
+      background: var(--secondary);
+    }
+
+    .todo-item.completed .todo-text {
+      color: var(--gray-dark);
+    }
+
+    .todo-content {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .todo-checkbox {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--gray);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .todo-checkbox:checked {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+
+    .todo-checkbox:checked::after {
+      content: '✓';
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .todo-checkbox:hover {
+      border-color: var(--primary);
+    }
+
+    .todo-text {
+      flex: 1;
+      cursor: pointer;
+      word-break: break-word;
+      font-size: 15px;
+      font-weight: 500;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .todo-item.completed .todo-text {
+      white-space: normal;
+    }
+
+    .todo-item.completed .todo-text::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 50%;
+      width: 100%;
+      height: 1px;
+      background: var(--gray-dark);
+      transform: translateY(-50%);
+    }
+
+    .todo-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .todo-actions button {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .todo-actions button:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .todo-actions button:hover svg {
+      stroke: var(--danger-hover);
+      transform: scale(1.1);
+    }
+
+    .todo-actions button svg {
+      stroke: var(--danger);
+      transition: var(--transition);
+      width: 18px;
+      height: 18px;
+    }
+
+    .progress-container {
+      margin-top: 30px;
+      position: relative;
+      height: 100px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      font-size: 14px;
+      color: var(--gray-dark);
+    }
+
+    .progress-header span {
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--gray);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      transition: var(--transition);
+      border-radius: 4px;
+    }
+
+    .progress-marker {
+      position: absolute;
+      left: 0;
+      top: -25px;
+      font-size: 24px;
+      transition: var(--transition);
+      transform: translateX(0) scaleX(-1);
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      z-index: 2;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+      gap: 10px;
+    }
+
+    .controls button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .clear-all {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    .clear-all:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .clear-all:hover svg {
+      stroke: white;
+    }
+
+    .clear-all svg {
+      stroke: var(--danger);
+      width: 16px;
+      height: 16px;
+      transition: var(--transition);
+    }
+
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+      backdrop-filter: blur(10px);
+    }
+
+    .celebration.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .celebration-content {
+      background: white;
+      padding: 40px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      max-width: 90%;
+      position: relative;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      transform: scale(0.9);
+      transition: var(--transition);
+      overflow: hidden;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .celebration.active .celebration-content {
+      transform: scale(1);
+    }
+
+    .celebration-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+    }
+
+    .celebration img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      max-height: 200px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .celebration h2 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+
+    .celebration p {
+      color: var(--gray-dark);
+      margin-bottom: 20px;
+    }
+
+    .close-celebration {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .close-celebration:hover {
+      background: var(--danger-hover);
+      transform: rotate(90deg);
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      opacity: 0;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+        border-radius: 0;
+      }
+      
+      body {
+        padding: 0;
+        background: var(--light);
+      }
+      
+      h1 {
+        font-size: 1.75rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+
+      .input-group input,
+      .input-group button {
+        width: 100%;
+      }
+      
+      .input-group button {
+        justify-content: center;
+        padding: 14px;
+      }
+      
+      .todo-item {
+        padding: 14px;
+      }
+
+      .todo-text {
+        white-space: normal;
+      }
+
+      .celebration-content {
+        padding: 30px 20px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      .controls button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @keyframes run {
+      0% { transform: translateX(var(--x)) scaleX(-1) translateY(0); }
+      50% { transform: translateX(var(--x)) scaleX(-1) translateY(-5px); }
+      100% { transform: translateX(var(--x)) scaleX(-1) translateY(0); }
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(1) rotate(0deg); }
+      25% { transform: scale(1.1) rotate(5deg); }
+      50% { transform: scale(1.2) rotate(0deg); }
+      75% { transform: scale(1.1) rotate(-5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes confettiFall {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Görev Listesi</h1>
+
+    <div class="input-group">
+      <input type="text" id="gorevInput" placeholder="Yeni görev ekle..." autocomplete="off"/>
+      <button id="ekleBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        Ekle
+      </button>
+    </div>
+
+    <div id="gorevListesi"></div>
+
+    <div class="progress-container">
+      <div class="progress-header">
+        <span>İlerleme Durumu</span>
+        <span id="progressText">0/0 tamamlandı</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-marker" id="progressMarker">🧍‍♂️</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="clear-all" id="clearAllBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+        Tümünü Temizle
+      </button>
+    </div>
+  </div>
+
+  <!-- Celebration Modal -->
+  <div class="celebration" id="celebration">
+    <div class="celebration-content">
+      <button class="close-celebration" id="closeCelebrationBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <img id="celebrationGif" src="" alt="Alkış yapan insanlar">
+      <h2>Tüm görevler tamamlandı! 🎉🎉🎉</h2>
+      
+    </div>
+  </div>
+
+  <script>
+    const ekleBtn = document.getElementById('ekleBtn');
+    const gorevInput = document.getElementById('gorevInput');
+    const gorevListesi = document.getElementById('gorevListesi');
+    const progressMarker = document.getElementById('progressMarker');
+    const progressText = document.getElementById('progressText');
+    const progressBar = document.getElementById('progressBar');
+    const celebration = document.getElementById('celebration');
+    const closeCelebrationBtn = document.getElementById('closeCelebrationBtn');
+    const celebrationGif = document.getElementById('celebrationGif');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    let gorevler = JSON.parse(localStorage.getItem('gorevler')) || [];
+    let celebrationShown = false;
+
+    // GIF URL'si
+    const clappingGifUrl = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWZoYXQ2ZnpvYjE1ZjYyYjltMHNscTU2ajBoY3o2YW92ZzJlaTJ4ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif";
+
+    function render() {
+      gorevListesi.innerHTML = '';
+      
+      if (gorevler.length === 0) {
+        gorevListesi.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: var(--gray-dark);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p>Henüz görev eklenmedi</p>
+          </div>
+        `;
+        return;
+      }
+      
+      gorevler.forEach((gorev, index) => {
+        const div = document.createElement('div');
+        div.className = 'todo-item' + (gorev.tamam ? ' completed' : '');
+        div.innerHTML = `
+          <div class="todo-content">
+            <input type="checkbox" class="todo-checkbox" ${gorev.tamam ? 'checked' : ''} onclick="toggle(${index})">
+            <span class="todo-text" onclick="toggle(${index})">${gorev.text}</span>
+          </div>
+          <div class="todo-actions">
+            <button onclick="sil(${index})" title="Sil">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        `;
+        gorevListesi.appendChild(div);
+      });
+      
+      updateProgress();
+      localStorage.setItem('gorevler', JSON.stringify(gorevler));
+    }
+
+    function toggle(i) {
+      gorevler[i].tamam = !gorevler[i].tamam;
+      render();
+      
+      // Eğer tüm görevler tamamlandıysa kutlama göster
+      if (gorevler.length > 0 && gorevler.every(g => g.tamam)) {
+        showCelebration();
+      } else {
+        celebrationShown = false;
+        hideCelebration();
+      }
+    }
+
+    function sil(i) {
+      // Silme animasyonu
+      const item = document.querySelectorAll('.todo-item')[i];
+      if (item) {
+        item.style.transform = 'translateX(100%)';
+        item.style.opacity = '0';
+        
+        setTimeout(() => {
+          gorevler.splice(i, 1);
+          
+          // Eğer hiç görev kalmadıysa veya tamamlanmamış görev varsa kutlamayı kapat
+          if (gorevler.length === 0 || !gorevler.every(g => g.tamam)) {
+            celebrationShown = false;
+            hideCelebration();
+          }
+          
+          render();
+        }, 300);
+      }
+    }
+
+    function clearAllTasks() {
+      if (gorevler.length === 0) return;
+      
+      if (!confirm('Tüm görevleri silmek istediğinize emin misiniz?')) {
+        return;
+      }
+      
+      // Animasyonla silme
+      const items = document.querySelectorAll('.todo-item');
+      items.forEach((item, index) => {
+        item.style.transform = 'translateX(100%)';
+        item.style.opacity = '0';
+        item.style.transitionDelay = `${index * 50}ms`;
+      });
+      
+      setTimeout(() => {
+        gorevler = [];
+        celebrationShown = false;
+        hideCelebration();
+        render();
+      }, 300 + (items.length * 50));
+    }
+
+    function showCelebration() {
+      if (!celebrationShown && gorevler.length > 0 && gorevler.every(g => g.tamam)) {
+        celebrationGif.src = clappingGifUrl;
+        celebration.classList.add('active');
+        celebrationShown = true;
+        createConfetti();
+      }
+    }
+
+    function hideCelebration() {
+      celebration.classList.remove('active');
+      celebrationGif.src = "";
+    }
+
+    function createConfetti() {
+      const colors = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+      
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.width = Math.random() * 10 + 5 + 'px';
+        confetti.style.height = Math.random() * 10 + 5 + 'px';
+        confetti.style.animation = `confettiFall ${Math.random() * 3 + 2}s linear forwards`;
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        document.body.appendChild(confetti);
+        
+        setTimeout(() => {
+          confetti.remove();
+        }, 5000);
+      }
+    }
+
+    ekleBtn.addEventListener('click', () => {
+      const text = gorevInput.value.trim();
+      if (text) {
+        gorevler.push({ text, tamam: false });
+        celebrationShown = false;
+        hideCelebration();
+        gorevInput.value = '';
+        render();
+        gorevInput.focus();
+      }
+    });
+
+    gorevInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') ekleBtn.click();
+    });
+
+    closeCelebrationBtn.addEventListener('click', hideCelebration);
+    clearAllBtn.addEventListener('click', clearAllTasks);
+
+    function updateProgress() {
+      const toplam = gorevler.length;
+      const tamamlanan = gorevler.filter(g => g.tamam).length;
+      const oran = toplam ? Math.round((tamamlanan / toplam) * 100) : 0;
+      
+      const track = document.querySelector('.progress-track');
+      const trackWidth = track.offsetWidth;
+      const markerWidth = 24;
+      
+      const maxPosition = trackWidth - markerWidth;
+      const newPosition = (oran / 100) * maxPosition;
+      
+      progressBar.style.width = `${oran}%`;
+      progressMarker.style.setProperty('--x', `${newPosition}px`);
+      
+      if (oran === 100 && toplam > 0) {
+        progressMarker.textContent = '🎉';
+        progressMarker.style.animation = 'celebrate 0.8s ease infinite';
+      } else if (tamamlanan > 0) {
+        progressMarker.textContent = '🏃‍♂️';
+        progressMarker.style.animation = 'run 0.5s steps(2) infinite';
+      } else {
+        progressMarker.textContent = '🧍‍♂️';
+        progressMarker.style.animation = 'none';
+      }
+      
+      progressText.textContent = `${tamamlanan}/${toplam} tamamlandı`;
+    }
+
+    render();
+  </script>
+</body>
+</html>
