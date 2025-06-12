@@ -627,11 +627,18 @@
     const celebrationGif = document.getElementById('celebrationGif');
     const clearAllBtn = document.getElementById('clearAllBtn');
 
+    // Görevleri localStorage'dan yükle veya boş bir dizi oluştur
     let gorevler = JSON.parse(localStorage.getItem('gorevler')) || [];
     let celebrationShown = false;
 
     // GIF URL'si
     const clappingGifUrl = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcWZoYXQ2ZnpvYjE1ZjYyYjltMHNscTU2ajBoY3o2YW92ZzJlaTJ4ZSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/11sBLVxNs7v6WA/giphy.gif";
+
+    // LocalStorage'ı güncelleme fonksiyonu
+    function updateLocalStorage() {
+      localStorage.setItem('gorevler', JSON.stringify(gorevler));
+      console.log("LocalStorage güncellendi:", gorevler); // Debug için
+    }
 
     function render() {
       gorevListesi.innerHTML = '';
@@ -647,6 +654,7 @@
             <p>Henüz görev eklenmedi</p>
           </div>
         `;
+        updateLocalStorage();
         return;
       }
       
@@ -655,11 +663,11 @@
         div.className = 'todo-item' + (gorev.tamam ? ' completed' : '');
         div.innerHTML = `
           <div class="todo-content">
-            <input type="checkbox" class="todo-checkbox" ${gorev.tamam ? 'checked' : ''} onclick="toggle(${index})">
-            <span class="todo-text" onclick="toggle(${index})">${gorev.text}</span>
+            <input type="checkbox" class="todo-checkbox" ${gorev.tamam ? 'checked' : ''} data-index="${index}">
+            <span class="todo-text" data-index="${index}">${gorev.text}</span>
           </div>
           <div class="todo-actions">
-            <button onclick="sil(${index})" title="Sil">
+            <button class="delete-btn" data-index="${index}" title="Sil">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -670,41 +678,62 @@
         gorevListesi.appendChild(div);
       });
       
+      // Event listener'ları ekle
+      document.querySelectorAll('.todo-checkbox, .todo-text').forEach(el => {
+        el.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          toggle(index);
+        });
+      });
+      
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const index = parseInt(this.getAttribute('data-index'));
+          sil(index);
+        });
+      });
+      
       updateProgress();
-      localStorage.setItem('gorevler', JSON.stringify(gorevler));
+      updateLocalStorage();
     }
 
     function toggle(i) {
-      gorevler[i].tamam = !gorevler[i].tamam;
-      render();
-      
-      // Eğer tüm görevler tamamlandıysa kutlama göster
-      if (gorevler.length > 0 && gorevler.every(g => g.tamam)) {
-        showCelebration();
-      } else {
-        celebrationShown = false;
-        hideCelebration();
+      if (i >= 0 && i < gorevler.length) {
+        gorevler[i].tamam = !gorevler[i].tamam;
+        updateLocalStorage();
+        render();
+        
+        // Eğer tüm görevler tamamlandıysa kutlama göster
+        if (gorevler.length > 0 && gorevler.every(g => g.tamam)) {
+          showCelebration();
+        } else {
+          celebrationShown = false;
+          hideCelebration();
+        }
       }
     }
 
     function sil(i) {
-      // Silme animasyonu
-      const item = document.querySelectorAll('.todo-item')[i];
-      if (item) {
-        item.style.transform = 'translateX(100%)';
-        item.style.opacity = '0';
-        
-        setTimeout(() => {
-          gorevler.splice(i, 1);
+      if (i >= 0 && i < gorevler.length) {
+        // Silme animasyonu
+        const item = document.querySelector(`.todo-item:nth-child(${i+1})`);
+        if (item) {
+          item.style.transform = 'translateX(100%)';
+          item.style.opacity = '0';
           
-          // Eğer hiç görev kalmadıysa veya tamamlanmamış görev varsa kutlamayı kapat
-          if (gorevler.length === 0 || !gorevler.every(g => g.tamam)) {
-            celebrationShown = false;
-            hideCelebration();
-          }
-          
-          render();
-        }, 300);
+          setTimeout(() => {
+            gorevler.splice(i, 1);
+            updateLocalStorage();
+            
+            // Eğer hiç görev kalmadıysa veya tamamlanmamış görev varsa kutlamayı kapat
+            if (gorevler.length === 0 || !gorevler.every(g => g.tamam)) {
+              celebrationShown = false;
+              hideCelebration();
+            }
+            
+            render();
+          }, 300);
+        }
       }
     }
 
@@ -725,6 +754,7 @@
       
       setTimeout(() => {
         gorevler = [];
+        updateLocalStorage();
         celebrationShown = false;
         hideCelebration();
         render();
@@ -769,6 +799,7 @@
       const text = gorevInput.value.trim();
       if (text) {
         gorevler.push({ text, tamam: false });
+        updateLocalStorage();
         celebrationShown = false;
         hideCelebration();
         gorevInput.value = '';
@@ -813,7 +844,8 @@
       progressText.textContent = `${tamamlanan}/${toplam} tamamlandı`;
     }
 
-    render();
+    // Sayfa yüklendiğinde render et
+    document.addEventListener('DOMContentLoaded', render);
   </script>
 </body>
 </html>
